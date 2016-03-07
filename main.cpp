@@ -392,3 +392,74 @@ int convertir(char caracter){
 	}
 }
 
+bool jaque(char** tablero, vector<Pieza> piezas, int jugador){
+	for (int i = 0; i < 32; ++i){
+		for (int j = 0; j < 8; ++j){
+			for (int k = 0; k < 8; ++k){
+				if(piezas.at(i).getTipo()=='K' && piezas.at(i).getJugador()==jugador){
+					if(muerteRey(i,j,jugador,tablero,piezas)){
+						return true;
+					}else{
+						return false;
+					}
+				}
+			}			
+		}
+	}
+}
+
+
+bool muerteRey(int i1,int j1,int jugador, char** tablero, vector<Pieza> piezas){
+	int contrario=1;
+	if(jugador==1){
+		contrario=2;
+	}
+
+	for (int i = 0; i < 32; ++i){
+		if(piezas.at(i).getTipo()=='B' && piezas.at(i).getJugador()==contrario){//alfil del otro jugador
+			if(abs(piezas.at(i).getPosicioni()-piezas.at(i).getPosicionj()) == abs(i1-j1)){//alfil en la diagonal izquierda
+				return true;
+			}else if((piezas.at(i).getPosicioni()+piezas.at(i).getPosicionj())== (i1+j1)){//alfil en la diagonal derecha
+				return true;
+			}
+		}else if(piezas.at(i).getTipo()=='T' && piezas.at(i).getJugador()==contrario){//torre del otro jugador
+			if(piezas.at(i).getPosicioni()==i1){//torre en la misma linea horizontal
+				return true;
+			}else if(piezas.at(i).getPosicionj()==j1){//torre en la misma linea vertical
+				return true;
+			}
+		}else if(piezas.at(i).getTipo()=='Q' && piezas.at(i).getJugador()==contrario){//reina del otro jugador
+			if(abs(piezas.at(i).getPosicioni()-piezas.at(i).getPosicionj()) == abs(i1-j1)){//reina en la diagonal izquierda
+				return true;
+			}else if((piezas.at(i).getPosicioni()+piezas.at(i).getPosicionj())== (i1+j1)){//reina en la diagonal derecha
+				return true;
+			}else if(piezas.at(i).getPosicioni()==i1){//reina en la misma linea horizontal
+				return true;
+			}else if(piezas.at(i).getPosicionj()==j1){//reina en la misma linea vertical
+				return true;
+			}
+		}else if(piezas.at(i).getTipo()=='Q' && piezas.at(i).getJugador()==contrario){//caballo del otro juagdor
+			if(((i1==piezas.at(i).getPosicioni()+2) && (piezas.at(i).getPosicionj()==j1+1)) || ((i1==piezas.at(i).getPosicioni()+2)&& (piezas.at(i).getPosicionj()==j1-1))){
+				return true;
+			}else if(((piezas.at(i).getPosicioni()==i1+2) && (j1==piezas.at(i).getPosicionj()+1)) || ((piezas.at(i).getPosicioni()==i1+2)&& (j1=piezas.at(i).getPosicionj()-1))){
+				return true;
+			}else if(((piezas.at(i).getPosicioni()==i1-1) && (piezas.at(i).getPosicionj()==j1+2)) || ((i1==piezas.at(i).getPosicioni()+1) && (piezas.at(i).getPosicionj()==j1+2))){
+				return true;
+			}else if(((piezas.at(i).getPosicioni()==i1+1)&&(piezas.at(i).getPosicionj()==j1+2)) || ((piezas.at(i).getPosicioni()==i1+1)&&(piezas.at(i).getPosicionj()==j1-2))){
+				return true;
+			}
+		}else if(piezas.at(i).getTipo()=='P' && piezas.at(i).getJugador()==contrario){//peon del otro jugador
+			if(contrario==1){//si el jugador contrario el es el jugador 1
+				if((j1==piezas.at(i).getPosicionj()) && (piezas.at(i).getPosicioni()==i1+1)){//peon arriba del rey
+					return true;
+				}
+			}else if((j1==piezas.at(i).getPosicionj()) && (i1==piezas.at(i).getPosicioni()+1)){//peon del jugador 2 debajo del rey
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+
