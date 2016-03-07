@@ -351,3 +351,44 @@ bool moveBishop(int i1, int i2, int j1, int j2){
 bool moveQueen(){
 	return true;
 }
+
+bool moveKing(int i1, int i2, int j1, int j2){
+	if((i2==i1-1) && (j2==j1-1)){
+		return true;
+	}else if((j1==j2) && (i2==i1-1)){
+		return true;
+	}else if((i2==i1-1) && (j2==j1+1)){
+		return true;
+	}else if((i1==i2) && (j2==j1-1)){
+		return true;
+	}else if((i1==i2) && (j2=j1+1)){
+		return true;
+	}else if((i2==i1+1) && (j2==j1-1)){
+		return true;
+	}else if((i2==i1+1) && (j2==j1)){
+		return true;
+	}else if((i2==i1+1) && (j2==j1+1)){
+		return true;
+	}
+}
+
+int convertir(char caracter){
+	if(caracter=='A' || caracter=='8'){
+		return 0;
+	}else if(caracter=='B' || caracter=='7'){
+		return 1;
+	}else if(caracter=='C' || caracter=='6'){
+		return 2;
+	}else if(caracter=='D' || caracter=='5'){
+		return 3;
+	}else if(caracter=='E' || caracter=='4'){
+		return 4;
+	}else if(caracter=='F' || caracter=='3'){
+		return 5;
+	}else if(caracter=='G' || caracter=='2'){
+		return 6;
+	}else if(caracter=='H' || caracter=='1'){
+		return 7;
+	}
+}
+
