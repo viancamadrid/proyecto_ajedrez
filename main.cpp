@@ -35,7 +35,6 @@ int main(int argc, char const *argv[]){
 	crearPiezas(piezas);
 	char**tablero=crearTablero();
 	llenarTablero(tablero, piezas);
-	//imprimirTablero(tablero);
 	int turno=1;
 	int op=menu();
 
@@ -47,26 +46,28 @@ int main(int argc, char const *argv[]){
 		imprimirTablero(tablero);
 		int op2=menu2();
 		while(op2!=50 && op2!=51){
-			clear();
-			imprimirTablero(tablero);
-			move(10,10);
-			char* mover=crearMover();
-			makeMove(piezas,tablero,turno,mover);
-			clear();
-			llenarTablero(tablero,piezas);
-			imprimirTablero(tablero);
-			eliminarMover(mover);
-			refresh();
-			turno++;
-			if(turno%2==0){
-				turno=2;
-			}else{
-				turno=1;
-			}
-			op2=menu2();
+			//if(!(jaque(tablero,piezas,turno))){
+				clear();
+				imprimirTablero(tablero);
+				move(10,10);
+				char* mover=crearMover();
+				makeMove(piezas,tablero,turno,mover);
+				llenarTablero(tablero,piezas);
+				imprimirTablero(tablero);
+				eliminarMover(mover);
+				refresh();
+				turno++;
+				if(turno%2==0){
+					turno=2;
+				}else{
+					turno=1;
+				}
+				op2=menu2();
+			//}
 		}
 	}else if(op==52){
-
+		getch();
+		endwin();
 	}
 	clear();
 	refresh();
@@ -484,13 +485,12 @@ bool jaque(char** tablero, vector<Pieza> piezas, int jugador){
 				if(piezas.at(i).getTipo()=='K' && piezas.at(i).getJugador()==jugador){
 					if(muerteRey(i,j,jugador,tablero,piezas)){
 						return true;
-					}else{
-						return false;
 					}
 				}
 			}			
 		}
 	}
+	return false;
 }
 
 
