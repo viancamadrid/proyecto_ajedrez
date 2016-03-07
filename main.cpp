@@ -8,6 +8,9 @@ using std::vector;
 using std::string;
 using std::abs;
 
+int menu();
+int menu2();
+int instrucciones();
 char* crearMover();
 char** crearTablero();
 void crearPiezas(vector<Pieza>&);
@@ -32,31 +35,113 @@ int main(int argc, char const *argv[]){
 	crearPiezas(piezas);
 	char**tablero=crearTablero();
 	llenarTablero(tablero, piezas);
-	imprimirTablero(tablero);
+	//imprimirTablero(tablero);
 	int turno=1;
-	
-	while(!(jaque())){
-		move(10,10);
-		char* mover=crearMover();
-		makeMove(piezas,tablero,turno,mover);
-		clear();
-		llenarTablero(tablero,piezas);
-		imprimirTablero(tablero);
-		eliminarMover(mover);
-		refresh();
-		turno++;
-		if(turno%2==0){
-			turno=2;
-		}else{
-			turno=1;
-		}
-	}
+	int op=menu();
 
+	if(op==51){
+		op=instrucciones();
+	}
+	if(op==49){
+		clear();
+		imprimirTablero(tablero);
+		int op2=menu2();
+		while(op2!=50 && op2!=51){
+			clear();
+			imprimirTablero(tablero);
+			move(10,10);
+			char* mover=crearMover();
+			makeMove(piezas,tablero,turno,mover);
+			clear();
+			llenarTablero(tablero,piezas);
+			imprimirTablero(tablero);
+			eliminarMover(mover);
+			refresh();
+			turno++;
+			if(turno%2==0){
+				turno=2;
+			}else{
+				turno=1;
+			}
+			op2=menu2();
+		}
+	}else if(op==52){
+
+	}
 	clear();
 	refresh();
 	getch();
 	endwin();
 	return 0;
+}
+
+int menu(){
+	init_pair(1,COLOR_BLACK,COLOR_WHITE);
+	init_pair(2,COLOR_YELLOW,COLOR_BLACK);
+	attrset(COLOR_PAIR(1));
+	int x,y;
+	getmaxyx(stdscr,y,x);
+	move(y/2,(x/2)-20);
+	printw("---MENU AJEDREZ---");
+	move(1+y/2,(x/2)-20);
+	attrset(COLOR_PAIR(2));
+	printw("1. Nueva Partida");
+	move(2+y/2,(x/2)-20);
+	printw("2. Cargar Partida");
+	move(3+y/2,(x/2)-20);
+	printw("3. Como Jugar Ajedrez");
+	move(4+y/2,(x/2)-20);
+	printw("4. Salir");
+	move(5+y/2,(x/2)-20);
+	printw("Opcion: ");
+	int opcion = getch();
+	return opcion;
+}
+
+int menu2(){
+	int x,y;
+	getmaxyx(stdscr,y,x);
+	move(y/2,(x/2)-20);
+	printw("1. Continuar");
+	move(1+y/2,(x/2)-20);
+	printw("2. Guardar Partida y Salir");
+	move(2+y/2,(x/2)-20);
+	printw("3. Salir");
+	move(3+y/2,(x/2)-20);
+	printw("Opcion: ");
+	int opcion = getch();
+	return opcion;
+}
+
+int instrucciones(){
+	clear();
+	int x,y;
+	init_pair(1,COLOR_BLACK,COLOR_WHITE);
+	init_pair(2,COLOR_YELLOW,COLOR_BLACK);
+	attrset(COLOR_PAIR(1));
+	getmaxyx(stdscr,y,x);
+	move(y/2,(x/2)-20);
+	printw("--MOVIMIENTOS--");
+	attrset(COLOR_PAIR(2));
+	move(1+y/2,(x/2)-20);
+	printw("PEON: una casilla enfrente");
+	move(2+y/2,(x/2)-20);
+	printw("TORRE: en linea recta horizontal o vertical");
+	move(3+y/2,(x/2)-20);
+	printw("CABALLO: una casilla arriba y dos a un lado o al reves");
+	move(4+y/2,(x/2)-20);
+	printw("ALFIL: en diagonal");
+	move(5+y/2,(x/2)-20);
+	printw("REINA: cualquier casilla");
+	move(6+y/2,(x/2)-20);
+	printw("REY: una casilla hacia cualquier lado");
+	move(7+y/2,(x/2)-20);
+	printw("PRESIONE ENTER");
+	if((getch())=='\n'){
+		clear();
+		int avanzar=menu();
+		return avanzar;	
+	}
 }
 
 char* crearMover(){
@@ -170,7 +255,7 @@ void imprimirTablero(char** tablero){
 	string espacio="      ";
 	init_pair(1,COLOR_YELLOW,COLOR_WHITE);
 	init_pair(2,COLOR_YELLOW,COLOR_BLACK);
-	init_pair(3,COLOR_WHITE,COLOR_YELLOW);
+	//init_pair(3,COLOR_WHITE,COLOR_YELLOW);
 	for (int i = 0; i < 8; ++i){
 		for (int j = 0; j < 8; ++j){
 			if((i+j)%2==0){
@@ -184,7 +269,7 @@ void imprimirTablero(char** tablero){
 		}
 		addch('\n');
 	}
-	attrset(COLOR_PAIR(3));
+	attrset(COLOR_PAIR(2));
 	return;
 }
 
@@ -325,7 +410,7 @@ bool moveTorre(int i1, int i2, int j1, int j2){
 	return false;
 }
 
-ool moveCaballo(int i1, int i2, int j1, int j2){
+bool moveCaballo(int i1, int i2, int j1, int j2){
 
 	if(((i1==i2+2) && (j2==j1+1)) || ((i1==i2+2)&& (j2=j1-1))){
 		return true;
