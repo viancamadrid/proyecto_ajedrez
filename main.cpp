@@ -324,3 +324,30 @@ bool moveTorre(int i1, int i2, int j1, int j2){
 	}
 	return false;
 }
+
+ool moveCaballo(int i1, int i2, int j1, int j2){
+
+	if(((i1==i2+2) && (j2==j1+1)) || ((i1==i2+2)&& (j2=j1-1))){
+		return true;
+	}else if(((i2==i1+2) && (j1==j2+1)) || ((i2==i1+2)&& (j1==j2-1))){
+		return true;
+	}else if(((i2==i1-1) && (j2==j1+2)) || ((i1==i2+1) && (j2==j1+2))){
+		return true;
+	}else if(((i2==i1+1)&&(j2==j1+2)) || ((i2==i1+1)&&(j2==j1-2))){
+		return true;
+	}
+	return false;
+}
+
+bool moveBishop(int i1, int i2, int j1, int j2){
+	if((i1+j1)==(i2+j2)){
+		return true;
+	}else if(abs(i1-j1)==abs(i2-j2)){
+		return true;
+	}
+	return false;
+}
+
+bool moveQueen(){
+	return true;
+}
