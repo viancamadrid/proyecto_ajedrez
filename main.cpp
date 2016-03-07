@@ -187,3 +187,120 @@ void imprimirTablero(char** tablero){
 	attrset(COLOR_PAIR(3));
 	return;
 }
+
+void makeMove(vector<Pieza>&  piezas, char** tablero, int jugador, char* mover){
+	int i1, j1, i2, j2;
+	bool bandera=false;
+	printw("%s%d%s","Ingrese Coordenada Jugador ",jugador," : ");
+	char ingresada=getch();
+	while(!(((int)ingresada>=65 && (int)ingresada<=72))){
+		ingresada=getch();
+	}
+	mover[0]=ingresada;
+
+	ingresada=getch();
+	while(!(((int)ingresada>=49 && (int)ingresada<=56))){
+		ingresada=getch();
+	}
+	mover[1]=ingresada;
+
+	ingresada=getch();
+	while(!(((int)ingresada>=65 && (int)ingresada<=72))){
+		ingresada=getch();
+	}
+	mover[2]=ingresada;
+
+	ingresada=getch();
+	while(!(((int)ingresada>=49 && (int)ingresada<=56))){
+		ingresada=getch();
+	}
+	mover[3]=ingresada;
+
+	move(15,15);
+	i1=convertir(mover[1]);
+	j1=convertir(mover[0]);
+	i2=convertir(mover[3]);
+	j2=convertir(mover[2]);
+	
+	char pieza=tablero[i1][j1];
+	if(pieza=='P'){
+		bool movimiento=movePeon(i1,i2,j1,j2,jugador);
+		if(movimiento){
+			for (int i = 0; i < 32; ++i){
+				if((piezas.at(i).getTipo()==pieza) && (piezas.at(i).getPosicioni()==i1) && (piezas.at(i).getPosicionj()==j1) && (piezas.at(i).getJugador()==jugador)){
+					piezas.at(i).setPosicioni(i2);
+					piezas.at(i).setPosicionj(j2);
+				}
+			}
+		}else{
+			move(15,15);
+			printw("%s","NO PUEDES MOVERLA! PERDISTE EL TURNO");
+		}
+	}else if(pieza=='T'){
+		bool movimiento=moveTorre(i1,i2,j1,j2);
+		if(movimiento){
+			for (int i = 0; i < 32; ++i){
+				if((piezas.at(i).getTipo()==pieza) && (piezas.at(i).getPosicioni()==i1) && (piezas.at(i).getPosicionj()==j1) && (piezas.at(i).getJugador()==jugador)){
+					piezas.at(i).setPosicioni(i2);
+					piezas.at(i).setPosicionj(j2);
+				}
+			}
+		}else{
+			move(15,15);
+			printw("%s","NO PUEDES MOVERLA! PERDISTE EL TURNO");
+		}
+	}else if(pieza=='C'){
+		if(moveCaballo(i1,i2,j1,j2)){
+			for (int i = 0; i < 32; ++i){
+				if((piezas.at(i).getTipo()==pieza) && (piezas.at(i).getPosicioni()==i1) && (piezas.at(i).getPosicionj()==j1) && (piezas.at(i).getJugador()==jugador)){
+					piezas.at(i).setPosicioni(i2);
+					piezas.at(i).setPosicionj(j2);
+				}
+			}
+		}else{
+			move(15,15);
+			printw("%s","NO PUEDES MOVERLA! PERDISTE EL TURNO");
+		}
+	}else if(pieza=='B'){
+		if(moveBishop(i1,i2,j1,j2)){
+			for (int i = 0; i < 32; ++i){
+				if((piezas.at(i).getTipo()==pieza) && (piezas.at(i).getPosicioni()==i1) && (piezas.at(i).getPosicionj()==j1) && (piezas.at(i).getJugador()==jugador)){
+					piezas.at(i).setPosicioni(i2);
+					piezas.at(i).setPosicionj(j2);
+				}
+			}
+		}else{
+			move(15,15);
+			printw("%s","NO PUEDES MOVERLA! PERDISTE EL TURNO");
+		}
+	}else if(pieza=='Q'){
+		if(moveQueen()){
+			for (int i = 0; i < 32; ++i){
+				if((piezas.at(i).getTipo()==pieza) && (piezas.at(i).getPosicioni()==i1) && (piezas.at(i).getPosicionj()==j1) && (piezas.at(i).getJugador()==jugador)){
+					piezas.at(i).setPosicioni(i2);
+					piezas.at(i).setPosicionj(j2);
+				}
+			}
+		}else{
+			move(15,15);
+			printw("%s","NO PUEDES MOVERLA! PERDISTE EL TURNO");
+		}
+	}else if(pieza=='K'){
+		if(moveKing(i1,i2,j1,j2)){
+			for (int i = 0; i < 32; ++i){
+				if((piezas.at(i).getTipo()==pieza) && (piezas.at(i).getPosicioni()==i1) && (piezas.at(i).getPosicionj()==j1) && (piezas.at(i).getJugador()==jugador)){
+					piezas.at(i).setPosicioni(i2);
+					piezas.at(i).setPosicionj(j2);
+				}
+			}
+		}else{
+			move(15,15);
+			printw("%s","NO PUEDES MOVERLA! PERDISTE EL TURNO");
+		}
+	}
+}
+
+void eliminarMover(char* mover){
+	delete[] mover;
+	return;
+}
