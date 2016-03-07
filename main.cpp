@@ -304,3 +304,23 @@ void eliminarMover(char* mover){
 	delete[] mover;
 	return;
 }
+
+bool movePeon(int i1, int i2, int j1, int j2, int jugador){
+	bool mover=false;
+	if(jugador==1){
+		if((j1==j2) && (i2==i1+1))
+			mover=true;
+	}else{
+		if((j1==j2) && (i1==i2+1))
+			mover=true;
+	}
+	return mover;
+}
+
+bool moveTorre(int i1, int i2, int j1, int j2){
+	//bool mover=false;
+	if((j1==j2) || (i1==i2)){
+		 return true;
+	}
+	return false;
+}
