@@ -60,6 +60,7 @@ int main(int argc, char const *argv[]){
 				char* mover=crearMover();
 				makeMove(piezas,tablero,turno,mover);
 				llenarTablero(tablero,piezas);
+				clear();
 				imprimirTablero(tablero);
 				eliminarMover(mover);
 				refresh();
@@ -88,6 +89,7 @@ int main(int argc, char const *argv[]){
 				char* mover=crearMover();
 				makeMove(piezas,tablero,turno,mover);
 				llenarTablero(tablero,piezas);
+				clear();
 				imprimirTablero(tablero);
 				eliminarMover(mover);
 				refresh();
@@ -102,9 +104,15 @@ int main(int argc, char const *argv[]){
 		}
 		if(op2==50){
 			crearPartida(piezas);
+		}else if(op2==51){
+			clear();
+			move(20,10);
+			printw("GRACIAS POR JUGAR!");
+			getch();
 		}
 	}else if(op==52){
 		clear();
+		move(20,10);
 		printw("GRACIAS POR JUGAR!");
 		getch();
 	}
@@ -312,6 +320,7 @@ void llenarTablero(char** tablero, vector<Pieza> piezas){
 
 void imprimirTablero(char** tablero){
 	string espacio="\t";
+	char numero=' ';
 	init_pair(1,COLOR_YELLOW,COLOR_WHITE);
 	init_pair(2,COLOR_YELLOW,COLOR_BLACK);
 	init_pair(3,COLOR_WHITE,COLOR_BLACK);
@@ -337,6 +346,10 @@ void imprimirTablero(char** tablero){
 void makeMove(vector<Pieza>&  piezas, char** tablero, int jugador, char* mover){
 	int i1, j1, i2, j2;
 	bool bandera=false;
+	printw("La Primera Fila de Arriba Hacia Abajo Es 8 y La Siguiente es 7 y Asi Sucesivamente");
+	move(11,10);
+	printw("Ejemplo: A8A6");
+	move(12,10);
 	printw("%s%d%s","Ingrese Coordenada Jugador ",jugador," : ");
 	char ingresada=getch();
 	while(!(((int)ingresada>=65 && (int)ingresada<=72))){
