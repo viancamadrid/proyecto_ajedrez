@@ -8,6 +8,7 @@ class Pieza{
 	int jugador;
 
 public:
+	Pieza();
 	Pieza(char, int, int, int);
 	void setTipo(char tipo);
 	void setPosicioni(int posicion_i);

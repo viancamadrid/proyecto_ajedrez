@@ -1,5 +1,7 @@
 #include "pieza.h"
 
+Pieza::Pieza(){}
+
 Pieza::Pieza(char tipo, int posicion_i, int posicion_j, int jugador){
 	this-> tipo=tipo;
 	this-> posicion_i=posicion_i;

@@ -3,11 +3,18 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <fstream>
+#include <iostream> 
 
+using std::ifstream;
+using std::ofstream;
 using std::vector;
 using std::string;
 using std::abs;
+using namespace std;
 
+void crearPartida(vector<Pieza>&);
+void cargarPartida(vector<Pieza>&);
 int menu();
 int menu2();
 int instrucciones();
@@ -65,15 +72,66 @@ int main(int argc, char const *argv[]){
 				op2=menu2();
 			//}
 		}
+		if(op2==50){
+			crearPartida(piezas);
+		}
+	}else if(op==50){
+		cargarPartida(piezas);
+		clear();
+		imprimirTablero(tablero);
+		int op2=menu2();
+		while(op2!=50 && op2!=51){
+			//if(!(jaque(tablero,piezas,turno))){
+				clear();
+				imprimirTablero(tablero);
+				move(10,10);
+				char* mover=crearMover();
+				makeMove(piezas,tablero,turno,mover);
+				llenarTablero(tablero,piezas);
+				imprimirTablero(tablero);
+				eliminarMover(mover);
+				refresh();
+				turno++;
+				if(turno%2==0){
+					turno=2;
+				}else{
+					turno=1;
+				}
+				op2=menu2();
+			//}
+		}
+		if(op2==50){
+			crearPartida(piezas);
+		}
 	}else if(op==52){
+		clear();
+		printw("GRACIAS POR JUGAR!");
 		getch();
-		endwin();
 	}
 	clear();
 	refresh();
 	getch();
 	endwin();
 	return 0;
+}
+
+void crearPartida(vector<Pieza>& piezas){
+	ofstream out_file("partida.bin",ios::out|ios::binary);
+	for (int i = 0; i < 32; ++i){
+		out_file.write((char*)&piezas[i],sizeof(Pieza));
+	}
+	out_file.flush();
+	out_file.close();
+}
+
+void cargarPartida(vector<Pieza>& piezas){
+	ifstream in_file("partida.bin",ios::in|ios::binary);
+	while(in_file.eof()){
+		Pieza temp;
+		in_file.read(reinterpret_cast<char*>(&temp),sizeof(Pieza));
+		piezas.push_back(temp);
+	}
+	in_file.close();
 }
 
 int menu(){
@@ -253,10 +311,12 @@ void llenarTablero(char** tablero, vector<Pieza> piezas){
 }
 
 void imprimirTablero(char** tablero){
-	string espacio="      ";
+	string espacio="\t";
 	init_pair(1,COLOR_YELLOW,COLOR_WHITE);
 	init_pair(2,COLOR_YELLOW,COLOR_BLACK);
-	//init_pair(3,COLOR_WHITE,COLOR_YELLOW);
+	init_pair(3,COLOR_WHITE,COLOR_BLACK);
+	attrset(COLOR_PAIR(3));
+	printw("A\t\tB\t\tC\t\tD\t\tE\t\tF\t\tG\t\tH\n");
 	for (int i = 0; i < 8; ++i){
 		for (int j = 0; j < 8; ++j){
 			if((i+j)%2==0){
