@@ -26,14 +26,18 @@ void imprimirTablero(char**);
 void makeMove(vector<Pieza>&, char**, int, char*);
 bool movePeon(int,int,int,int,int);
 int convertir(char);
-bool moveTorre(int,int,int,int);
+bool moveTorre(int,int,int,int,char**);
 bool moveCaballo(int,int,int,int);
 bool moveBishop(int,int,int,int);
 bool moveQueen();
 bool moveKing(int, int, int, int);
 void eliminarMover(char*);
-bool muerteRey(int ,int,int, char** , vector<Pieza>);
-bool jaque(char**, vector<Pieza>, int);
+bool jaque(vector<Pieza>,int,int,char**);
+bool jaquePeon(int,int,int,int);
+bool jaqueTorre(int,int,int,int,char**);
+bool nadaEnmedioTorre(int,int,int,int,char**);
+bool jaqueCaballo(int,int,int,int);
+bool jaqueBishop(int,int,int,int,char**);
 
 int main(int argc, char const *argv[]){
 	initscr();
@@ -44,6 +48,11 @@ int main(int argc, char const *argv[]){
 	llenarTablero(tablero, piezas);
 	int turno=1;
 	int op=menu();
+
+	/*while(op!=52){
+
+	}*/
+
 
 	if(op==51){
 		op=instrucciones();
@@ -325,7 +334,9 @@ void imprimirTablero(char** tablero){
 	init_pair(2,COLOR_YELLOW,COLOR_BLACK);
 	init_pair(3,COLOR_WHITE,COLOR_BLACK);
 	attrset(COLOR_PAIR(3));
-	printw("A\t\tB\t\tC\t\tD\t\tE\t\tF\t\tG\t\tH\n");
+	//printw("A\t\tB\t\tC\t\tD\t\tE\t\tF\t\tG\t\tH\n");
+	printw("\tA\t\tB\t\tC\t\tD\t\tE\t\tF\t\tG\t\tH\n");
+	int num=8;
 	for (int i = 0; i < 8; ++i){
 		for (int j = 0; j < 8; ++j){
 			if((i+j)%2==0){
@@ -337,7 +348,9 @@ void imprimirTablero(char** tablero){
 				printw("%s%c%s", espacio.c_str(),tablero[i][j],espacio.c_str());
 			}
 		}
-		addch('\n');
+		attrset(COLOR_PAIR(3));
+		printw("%c%d%c",'\t',num,'\n');
+		num--;
 	}
 	attrset(COLOR_PAIR(2));
 	return;
@@ -346,9 +359,9 @@ void imprimirTablero(char** tablero){
 void makeMove(vector<Pieza>&  piezas, char** tablero, int jugador, char* mover){
 	int i1, j1, i2, j2;
 	bool bandera=false;
-	printw("La Primera Fila de Arriba Hacia Abajo Es 8 y La Siguiente es 7 y Asi Sucesivamente");
+	printw("Ingresar la Coordenada en Mayusculas");
 	move(11,10);
-	printw("Ejemplo: A8A6");
+	printw("Ejemplo: B7B6");
 	move(12,10);
 	printw("%s%d%s","Ingrese Coordenada Jugador ",jugador," : ");
 	char ingresada=getch();
@@ -396,7 +409,7 @@ void makeMove(vector<Pieza>&  piezas, char** tablero, int jugador, char* mover){
 			printw("%s","NO PUEDES MOVERLA! PERDISTE EL TURNO");
 		}
 	}else if(pieza=='T'){
-		bool movimiento=moveTorre(i1,i2,j1,j2);
+		bool movimiento=moveTorre(i1,i2,j1,j2,tablero);
 		if(movimiento){
 			for (int i = 0; i < 32; ++i){
 				if((piezas.at(i).getTipo()==pieza) && (piezas.at(i).getPosicioni()==i1) && (piezas.at(i).getPosicionj()==j1) && (piezas.at(i).getJugador()==jugador)){
@@ -476,9 +489,9 @@ bool movePeon(int i1, int i2, int j1, int j2, int jugador){
 	return mover;
 }
 
-bool moveTorre(int i1, int i2, int j1, int j2){
+bool moveTorre(int i1, int i2, int j1, int j2, char ** tablero){
 	//bool mover=false;
-	if((j1==j2) || (i1==i2)){
+	if(nadaEnmedioTorre(i1,i2,j1,j2,tablero)){
 		 return true;
 	}
 	return false;
@@ -551,73 +564,123 @@ int convertir(char caracter){
 	}
 }
 
-bool jaque(char** tablero, vector<Pieza> piezas, int jugador){
+
+//jaque , el rey es amenazado
+//jaquemate, el rey no tiene escapatoria
+//validar los movimientos validos para cada pieza y si una toca al rey enemigo entonces es jaque
+
+bool jaque(vector<Pieza> piezas, int jugador, int enemigo, char** tablero){
+	vector<Pieza> piezas2;
+	int pos_i_enemigo, pos_j_enemigo, pos_i_jugador, pos_j_jugador;
+
+	//mira las piezas del jugador
+
 	for (int i = 0; i < 32; ++i){
-		for (int j = 0; j < 8; ++j){
-			for (int k = 0; k < 8; ++k){
-				if(piezas.at(i).getTipo()=='K' && piezas.at(i).getJugador()==jugador){
-					if(muerteRey(i,j,jugador,tablero,piezas)){
-						return true;
-					}
-				}
-			}			
+		if(piezas.at(i).getJugador()==jugador){//agrega las piezas que tiene ese juagdor a un vector
+			piezas2.push_back(piezas.at(i));
+		}
+		if(piezas.at(i).getJugador()==enemigo && piezas.at(i).getTipo()=='K'){
+			pos_i_enemigo=piezas.at(i).getPosicioni();
+			pos_j_enemigo=piezas.at(i).getPosicionj();
+		}
+	}
+
+	for (int i = 0; i < piezas2.size(); ++i){
+		if(piezas2.at(i).getTipo()=='P'){//busca los peones
+			pos_i_jugador=piezas2.at(i).getPosicioni();
+			pos_j_jugador=piezas2.at(i).getPosicionj();
+			if(jaquePeon(pos_i_jugador,pos_j_jugador,pos_i_enemigo,pos_j_enemigo)){
+				return true;
+			}
+		}else if(piezas2.at(i).getTipo()=='T'){//busca las torres
+			if(jaqueTorre(pos_i_jugador,pos_j_jugador,pos_i_enemigo,pos_j_enemigo,tablero)){
+				return true;
+			}
+		}else if(piezas2.at(i).getTipo()=='C'){
+			if(jaqueCaballo(pos_i_jugador,pos_j_jugador,pos_i_enemigo,pos_j_enemigo)){
+				return true;
+			}
+			return false;
+		}else if(piezas2.at(i).getTipo()=='B'){
+			
+		}else if(piezas2.at(i).getTipo()=='Q'){
+			
+		}else if(piezas2.at(i).getTipo()=='K'){
+			
 		}
 	}
 	return false;
 }
 
 
-bool muerteRey(int i1,int j1,int jugador, char** tablero, vector<Pieza> piezas){
-	int contrario=1;
-	if(jugador==1){
-		contrario=2;
-	}
-
-	for (int i = 0; i < 32; ++i){
-		if(piezas.at(i).getTipo()=='B' && piezas.at(i).getJugador()==contrario){//alfil del otro jugador
-			if(abs(piezas.at(i).getPosicioni()-piezas.at(i).getPosicionj()) == abs(i1-j1)){//alfil en la diagonal izquierda
-				return true;
-			}else if((piezas.at(i).getPosicioni()+piezas.at(i).getPosicionj())== (i1+j1)){//alfil en la diagonal derecha
-				return true;
-			}
-		}else if(piezas.at(i).getTipo()=='T' && piezas.at(i).getJugador()==contrario){//torre del otro jugador
-			if(piezas.at(i).getPosicioni()==i1){//torre en la misma linea horizontal
-				return true;
-			}else if(piezas.at(i).getPosicionj()==j1){//torre en la misma linea vertical
-				return true;
-			}
-		}else if(piezas.at(i).getTipo()=='Q' && piezas.at(i).getJugador()==contrario){//reina del otro jugador
-			if(abs(piezas.at(i).getPosicioni()-piezas.at(i).getPosicionj()) == abs(i1-j1)){//reina en la diagonal izquierda
-				return true;
-			}else if((piezas.at(i).getPosicioni()+piezas.at(i).getPosicionj())== (i1+j1)){//reina en la diagonal derecha
-				return true;
-			}else if(piezas.at(i).getPosicioni()==i1){//reina en la misma linea horizontal
-				return true;
-			}else if(piezas.at(i).getPosicionj()==j1){//reina en la misma linea vertical
-				return true;
-			}
-		}else if(piezas.at(i).getTipo()=='Q' && piezas.at(i).getJugador()==contrario){//caballo del otro juagdor
-			if(((i1==piezas.at(i).getPosicioni()+2) && (piezas.at(i).getPosicionj()==j1+1)) || ((i1==piezas.at(i).getPosicioni()+2)&& (piezas.at(i).getPosicionj()==j1-1))){
-				return true;
-			}else if(((piezas.at(i).getPosicioni()==i1+2) && (j1==piezas.at(i).getPosicionj()+1)) || ((piezas.at(i).getPosicioni()==i1+2)&& (j1=piezas.at(i).getPosicionj()-1))){
-				return true;
-			}else if(((piezas.at(i).getPosicioni()==i1-1) && (piezas.at(i).getPosicionj()==j1+2)) || ((i1==piezas.at(i).getPosicioni()+1) && (piezas.at(i).getPosicionj()==j1+2))){
-				return true;
-			}else if(((piezas.at(i).getPosicioni()==i1+1)&&(piezas.at(i).getPosicionj()==j1+2)) || ((piezas.at(i).getPosicioni()==i1+1)&&(piezas.at(i).getPosicionj()==j1-2))){
-				return true;
-			}
-		}else if(piezas.at(i).getTipo()=='P' && piezas.at(i).getJugador()==contrario){//peon del otro jugador
-			if(contrario==1){//si el jugador contrario el es el jugador 1
-				if((j1==piezas.at(i).getPosicionj()) && (piezas.at(i).getPosicioni()==i1+1)){//peon arriba del rey
-					return true;
-				}
-			}else if((j1==piezas.at(i).getPosicionj()) && (i1==piezas.at(i).getPosicioni()+1)){//peon del jugador 2 debajo del rey
-				return true;
-			}
-		}
+bool jaquePeon(int i_jugador, int j_jugador, int i_enemigo, int j_enemigo){//si el peon esta justo detras del rey
+	if((i_jugador==i_enemigo+1) && (j_jugador==j_enemigo)){
+		return true;
 	}
 	return false;
 }
 
+bool jaqueTorre(int i_jugador, int j_jugador, int i_enemigo, int j_enemigo, char** tablero){
+	if(nadaEnmedioTorre(i_jugador,j_jugador,i_enemigo, j_enemigo,tablero)){
+		return true;
+	}
+	return false;
+}
 
+bool nadaEnmedioTorre(int i1, int j1, int i2, int j2, char** tablero){
+	if(i1==i2){
+		if(j2>j1){//la posicion j del rey es mayor a la de la torre
+			for (int i = j1; i <j2; ++i){
+				if(tablero[i1][i]!=' '){//si no hay un espacio entonces hay una pieza en el camino
+					return false;
+				}
+			}
+			return true;
+		}else{//la posicion j de la torre es mayor a la del rey
+			for (int i = j2; i <j1; ++i){
+				if(tablero[i1][i]!=' '){
+					return false;
+				}
+			}
+			return true;
+		}
+	}else if(j1==j2){
+		if(i2>i1){//la posicion i del rey es mayor a la de la torre
+			for (int i = i1; i <i2; ++i){
+				if(tablero[i][j1]!=' '){//si no hay un espacio entonces hay una pieza en el camino
+					return false;
+				}
+			}
+			return true;
+		}else{//la posicion i de la torre es mayor a la del rey
+			for (int i = i2; i <i1; ++i){
+				if(tablero[i][j1]!=' '){
+					return false;
+				}
+			}
+			return true;
+		}
+	}
+	return false;// si las posiciones no estan en la misma linea
+}
 
+bool jaqueCaballo(int i1, int j1, int i2, int j2){
+	if(moveCaballo(i1,j1,i2,j2)){
+		return true;
+	}
+	return false;
+}
+
+bool jaqueBishop(int i1, int j1, int i2, int j2, char** tablero){
+
+}
+
+/*
+if((i1+j1)==(i2+j2)){
+		return true;
+}else if(abs(i1-j1)==abs(i2-j2)){
+		return true;
+}
+return false;
+
+*/
