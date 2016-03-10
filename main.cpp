@@ -17,7 +17,7 @@ void crearPartida(vector<Pieza>&);
 void cargarPartida(vector<Pieza>&);
 int menu();
 int menu2();
-int instrucciones();
+void instrucciones();
 char* crearMover();
 char** crearTablero();
 void crearPiezas(vector<Pieza>&);
@@ -37,7 +37,9 @@ bool jaquePeon(int,int,int,int);
 bool jaqueTorre(int,int,int,int,char**);
 bool nadaEnmedioTorre(int,int,int,int,char**);
 bool jaqueCaballo(int,int,int,int);
-bool jaqueBishop(int,int,int,int,char**);
+bool jaqueBishop(int,int,int,int);
+bool jaqueKing(int,int,int,int);
+void eliminarTablero(char**);
 
 int main(int argc, char const *argv[]){
 	initscr();
@@ -46,90 +48,93 @@ int main(int argc, char const *argv[]){
 	crearPiezas(piezas);
 	char**tablero=crearTablero();
 	llenarTablero(tablero, piezas);
-	int turno=1;
+	int turno=1,noturno=2;
 	int op=menu();
 
-	/*while(op!=52){
-
-	}*/
-
-
-	if(op==51){
-		op=instrucciones();
-	}
-	if(op==49){
-		clear();
-		imprimirTablero(tablero);
-		int op2=menu2();
-		while(op2!=50 && op2!=51){
-			//if(!(jaque(tablero,piezas,turno))){
-				clear();
-				imprimirTablero(tablero);
-				move(10,10);
-				char* mover=crearMover();
-				makeMove(piezas,tablero,turno,mover);
-				llenarTablero(tablero,piezas);
-				clear();
-				imprimirTablero(tablero);
-				eliminarMover(mover);
-				refresh();
-				turno++;
-				if(turno%2==0){
-					turno=2;
-				}else{
-					turno=1;
-				}
-				op2=menu2();
-			//}
-		}
-		if(op2==50){
-			crearPartida(piezas);
-		}
-	}else if(op==50){
-		cargarPartida(piezas);
-		clear();
-		imprimirTablero(tablero);
-		int op2=menu2();
-		while(op2!=50 && op2!=51){
-			//if(!(jaque(tablero,piezas,turno))){
-				clear();
-				imprimirTablero(tablero);
-				move(10,10);
-				char* mover=crearMover();
-				makeMove(piezas,tablero,turno,mover);
-				llenarTablero(tablero,piezas);
-				clear();
-				imprimirTablero(tablero);
-				eliminarMover(mover);
-				refresh();
-				turno++;
-				if(turno%2==0){
-					turno=2;
-				}else{
-					turno=1;
-				}
-				op2=menu2();
-			//}
-		}
-		if(op2==50){
-			crearPartida(piezas);
-		}else if(op2==51){
+	while(op!=52){
+		if(op==49){
 			clear();
-			move(20,10);
-			printw("GRACIAS POR JUGAR!");
-			getch();
+			imprimirTablero(tablero);
+			int op2=menu2();
+			while(op2!=50 && op2!=51){
+				clear();
+				imprimirTablero(tablero);
+				move(10,10);
+				char* mover=crearMover();
+				makeMove(piezas,tablero,turno,mover);
+				llenarTablero(tablero,piezas);
+				clear();
+				imprimirTablero(tablero);
+				eliminarMover(mover);
+				refresh();
+				if(jaque(piezas,turno,noturno,tablero)){
+					clear();
+					move(20,10);
+					printw("JAQUE!!!!");
+					break;
+				}
+				turno++;
+				if(turno%2==0){
+					turno=2;
+					noturno=1;
+				}else{
+					turno=1;
+					noturno=2;
+				}
+				op2=menu2();
+			}
+			if(op2==50){
+				crearPartida(piezas);
+			}
+		}else if(op==50){
+			cargarPartida(piezas);
+			clear();
+			imprimirTablero(tablero);
+			int op2=menu2();
+			while(op2!=50 && op2!=51){
+				clear();
+				imprimirTablero(tablero);
+				move(10,10);
+				char* mover=crearMover();
+				makeMove(piezas,tablero,turno,mover);
+				llenarTablero(tablero,piezas);
+				clear();
+				imprimirTablero(tablero);
+				eliminarMover(mover);
+				refresh();
+				if(jaque(piezas,turno,noturno,tablero)){
+					clear();
+					move(20,10);
+					printw("JAQUE!!!!");
+					break;
+				}
+				turno++;
+				if(turno%2==0){
+					turno=2;
+					noturno=1;
+				}else{
+					turno=1;
+					noturno=2;
+				}
+				op2=menu2();
+			}
+			if(op2==50){
+				crearPartida(piezas);
+			}
+		}else if(op==51){
+			instrucciones();
 		}
-	}else if(op==52){
 		clear();
-		move(20,10);
-		printw("GRACIAS POR JUGAR!");
-		getch();
+		op=menu();
 	}
+	eliminarTablero(tablero);
 	clear();
+	move(20,10);
+	printw("GRACIAS POR JUGAR!");
 	refresh();
 	getch();
 	endwin();
-	return 0;
+	return 0;	
 }
 
 void crearPartida(vector<Pieza>& piezas){
@@ -189,7 +194,7 @@ int menu2(){
 	return opcion;
 }
 
-int instrucciones(){
+void instrucciones(){
 	clear();
 	int x,y;
 	init_pair(1,COLOR_BLACK,COLOR_WHITE);
@@ -215,8 +220,9 @@ int instrucciones(){
 	printw("PRESIONE ENTER");
 	if((getch())=='\n'){
 		clear();
-		int avanzar=menu();
-		return avanzar;	
+		//int avanzar=menu();
+		//return avanzar;
+		return;	
 	}
 }
 
@@ -363,6 +369,8 @@ void makeMove(vector<Pieza>&  piezas, char** tablero, int jugador, char* mover){
 	move(11,10);
 	printw("Ejemplo: B7B6");
 	move(12,10);
+	printw("Si Se Ingresa Mal La Coordenda Se Pierde el Turno y Pasa al Siguiente Juagdor");
+	move(13,10);
 	printw("%s%d%s","Ingrese Coordenada Jugador ",jugador," : ");
 	char ingresada=getch();
 	while(!(((int)ingresada>=65 && (int)ingresada<=72))){
@@ -564,11 +572,6 @@ int convertir(char caracter){
 	}
 }
 
-
-//jaque , el rey es amenazado
-//jaquemate, el rey no tiene escapatoria
-//validar los movimientos validos para cada pieza y si una toca al rey enemigo entonces es jaque
-
 bool jaque(vector<Pieza> piezas, int jugador, int enemigo, char** tablero){
 	vector<Pieza> piezas2;
 	int pos_i_enemigo, pos_j_enemigo, pos_i_jugador, pos_j_jugador;
@@ -602,11 +605,17 @@ bool jaque(vector<Pieza> piezas, int jugador, int enemigo, char** tablero){
 			}
 			return false;
 		}else if(piezas2.at(i).getTipo()=='B'){
-			
+			if(jaqueBishop(pos_i_jugador,pos_j_jugador,pos_i_enemigo,pos_j_enemigo)){
+				return true;
+			}
+			return false;
 		}else if(piezas2.at(i).getTipo()=='Q'){
-			
+			return true;
 		}else if(piezas2.at(i).getTipo()=='K'){
-			
+			if(jaqueKing(pos_i_jugador,pos_j_jugador,pos_i_enemigo,pos_j_enemigo)){
+				return true;
+			}
+			return false;
 		}
 	}
 	return false;
@@ -671,16 +680,26 @@ bool jaqueCaballo(int i1, int j1, int i2, int j2){
 	return false;
 }
 
-bool jaqueBishop(int i1, int j1, int i2, int j2, char** tablero){
-
+bool jaqueBishop(int i1, int j1, int i2, int j2){
+	if((i1+j1)==(i2+j2)){
+		return true;
+	}else if(abs(i1-j1)==abs(i2-j2)){
+		return true;
+	}
+	return false;
 }
 
-/*
-if((i1+j1)==(i2+j2)){
+bool jaqueKing(int i1, int j1, int i2, int j2){
+	if(moveKing(i1,j1,i2,j2)){
 		return true;
-}else if(abs(i1-j1)==abs(i2-j2)){
-		return true;
+	}
+	return false;
 }
-return false;
 
-*/
+void eliminarTablero(char** tablero){
+	for (int i = 0; i < 8; ++i){
+		delete[] tablero[i];
+	}
+	delete[] tablero;
+	return;
+}
